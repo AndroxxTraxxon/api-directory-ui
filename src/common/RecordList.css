@@ -1,0 +1,49 @@
+/* DashboardStyles.css */
+.common-list {
+    margin-bottom: 30px;
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 8px; /* Optional: Adds rounded corners */
+    padding: 15px; /* Optional: Adds some padding inside the component */
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.common-list h2 {
+    margin: 0;
+}
+
+.add-button,
+.configure-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.configure-button {
+    background-color: #008CBA; /* Blue */
+    color: white;
+    margin-left: 10px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}

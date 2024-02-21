@@ -4,9 +4,30 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "rm -r .parcel-cache && parcel 'src/*.html' --lazy",
+    "build": "parcel build --target default",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^18.2.56",
+    "@types/react-dom": "^18.2.19",
+    "parcel": "^2.11.0",
+    "process": "^0.11.10"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-final-form": "^6.5.9",
+    "react-router-dom": "^6.22.1"
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "targets": {
+    "default": {
+      "distDir": "./build/default"
+    }
+  },
+  "source": "src/index.html"
 }

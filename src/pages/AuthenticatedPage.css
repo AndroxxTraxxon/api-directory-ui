@@ -1,0 +1,43 @@
+/* AuthenticatedPage.css */
+.authenticated-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  header {
+    background-color: #333; /* Darker header background */
+    color: #fff; /* Light text color for contrast */
+    padding: 10px 20px;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  nav button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  nav button:hover {
+    background-color: #0056b3;
+  }
+  
+  main {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  footer {
+    background-color: #f1f1f1; /* Light footer background */
+    padding: 10px 20px;
+    text-align: center;
+  }
+  

@@ -1,0 +1,20 @@
+/* Assuming this is added to your existing DashboardStyles.css or a similar file */
+
+.record-list-container {
+    display: flex;
+    justify-content: space-around;
+    /* Distributes space around items */
+    flex-wrap: wrap;
+    /* Allows items to wrap to the next line on smaller screens */
+}
+
+/* You might need to adjust the width of the common-list to ensure they fit side by side */
+.common-list {
+    flex: 1;
+    /* Allows the list to grow to fill available space */
+    margin: 10px;
+    /* Adds some space between the lists */
+    max-width: calc(50% - 20px);
+    /* Sets a max-width to prevent lists from growing too large */
+    /* Other styles remain unchanged */
+}
