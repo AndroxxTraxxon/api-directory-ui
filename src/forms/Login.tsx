@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Form, Field } from 'react-final-form';
 import { useAuth } from '../context/Auth';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/Toast';
 import './Login.css';
 
 type LoginFormValues = {
@@ -9,9 +10,10 @@ type LoginFormValues = {
   password: string,
 };
 
-const LoginForm = () => {
+function LoginForm(){
   const navigate = useNavigate();
   const { login, claims } = useAuth();
+  const { publish } = useToast();
 
   useEffect(() => {
     if(claims !== null) {
@@ -19,36 +21,36 @@ const LoginForm = () => {
     }
   }, []);
 
-  const onSubmit = async (values: LoginFormValues) => {
-    try {
-      const response = await fetch('https://apigateway.local/auth/v1/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password,
-        }),
-      });
+  async function onSubmit(values: LoginFormValues){
+    const response = await fetch('https://apigateway.local/auth/v1/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+      }),
+    });
 
-      if (!response.ok) {
-        const message = (await response.json()).error;
-        console.error(message);
-        throw new Error();
-      }
-
-      login(await response.text()); // Save the auth token using the context's login method
-      return navigate("/");
-    } catch (error) {
-      console.error('Login error:', error);
-    
+    if (!response.ok) {
+      const message = (await response.json()).error;
+      console.error(message);
+      publish({
+        title: "Failed to log in",
+        message,
+        variant: 'error'
+      })
+      return false;
     }
+
+    login(await response.text()); // Save the auth token using the context's login method
+    return navigate("/");
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>API Gateway Login</h2>
       <Form
         onSubmit={onSubmit}
         render={({ handleSubmit }) => (

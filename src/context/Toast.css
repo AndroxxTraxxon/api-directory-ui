@@ -1,0 +1,88 @@
+.toast-container {
+    position: fixed;
+    /* Fixed position to stay at the top */
+    top: 0;
+    /* Align to the top of the window */
+    left: 50%;
+    /* Center container horizontally */
+    transform: translateX(-50%);
+    /* Adjust for exact centering */
+    z-index: 1000;
+    /* High z-index to stay on top */
+    display: flex;
+    /* Use flexbox for the inner items */
+    flex-direction: column;
+    /* Stack toasts vertically */
+    align-items: center;
+    /* Center toasts horizontally */
+    width: auto;
+    /* Auto width based on content */
+    max-width: 100%;
+    /* Ensure it doesn't exceed the window width */
+    padding: 10px;
+    /* Add some space around the toasts */
+    box-sizing: border-box;
+    /* Include padding in the width */
+}
+
+.toast {
+    background-color: #fff;
+    /* Light background for the toast */
+    border-radius: 4px;
+    /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for depth */
+    padding: 16px 24px;
+    /* Space inside the toast */
+    margin-top: 10px;
+    /* Space between toasts */
+    display: flex;
+    /* Use flexbox for layout */
+    align-items: center;
+    /* Align items vertically */
+    justify-content: space-between;
+    /* Space between text and close button */
+    min-width: 300px;
+    /* Minimum width for consistency */
+    max-width: 600px;
+    /* Maximum width to avoid overly wide toasts */
+}
+
+.toast button {
+    border: none;
+    /* Remove default button border */
+    background: none;
+    /* Remove default button background */
+    cursor: pointer;
+    /* Change cursor to pointer */
+    margin-left: 20px;
+    /* Space between text and button */
+}
+
+/* Example styles for different types of toasts */
+.toast.warning {
+    background-color: rgb(235, 202, 104);
+    color: #a87e00;
+    /* Bootstrap warning color */
+}
+
+.toast.success {
+    background-color: #c2ffd0;
+    /* Greenish background for success */
+    color: #2d572c;
+    /* Dark green text for contrast */
+}
+
+.toast.error {
+    background-color: #e6b0b0;
+    /* Reddish background for error */
+    color: #612d2d;
+    /* Dark red text for contrast */
+}
+
+.toast.info {
+    background-color: #b6d2e7;
+    /* Bluish background for info */
+    color: #2c587a;
+    /* Dark blue text for contrast */
+}

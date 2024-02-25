@@ -1,21 +1,26 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/Auth';
+import { ToastProvider } from './context/Toast';
 const LoginPage = React.lazy(() => import('./pages/Login'));
-const PageNotFound = React.lazy(() => import('./pages/PageNotFound'));
+const NotFoundPage = React.lazy(() => import('./pages/PageNotFound'));
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage'));
 
 function App() {
   return (
-    <AuthProvider>
+    <ToastProvider>
       <Router>
-        <Routes>
-          <Route exact path="/login" element={<Suspense><LoginPage/></Suspense>} />
-          <Route exact path="/" element={<Suspense><DashboardPage/></Suspense>} />
-          <Route path="*" element={<Suspense><PageNotFound/></Suspense>} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route exact path="/login" Component={LoginPage}/>
+            <Route exact path="/reset-password/:token?" Component={ResetPasswordPage} />
+            <Route exact path="/" Component={DashboardPage} />
+            <Route path="*" Component={NotFoundPage} />
+          </Routes>
+        </AuthProvider>
       </Router>
-    </AuthProvider>
+    </ToastProvider>
   );
 }
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import AuthenticatedPage from './AuthenticatedPage'; // Adjust the import path as necessary
 
-const NotFoundPage = () => {
+function NotFoundPage(){
   return (
     <AuthenticatedPage>
       <div>

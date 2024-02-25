@@ -1,73 +1,134 @@
 // Dashboard.js
 import React, { useEffect, useState } from 'react';
 import AuthenticatedPage from './AuthenticatedPage'; // Ensure this path is correct
-import RecordList from '../common/RecordList';
+import RecordList, { ListItem } from '../common/RecordList';
 import { useAuth } from '../context/Auth';
+import UserConfigForm from '../forms/UserConfig';
+import ServiceConfigForm from '../forms/ServiceConfig';
 import "./DashboardPage.css";
+import Modal from '../common/Modal';
+import { GatewayUser } from '../models/user';
+import { ApiService } from '../models/service';
+import NewServiceForm from '../forms/NewService';
+import NewUserForm from '../forms/NewUser';
 
-const DashboardPage = () => {
+
+function DashboardPage(){
 
   const { authFetch } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [services, setServices] = useState([]);
+  const [users, setUsers] = useState<Array<ListItem<GatewayUser>>>([]);
+  const [services, setServices] = useState<Array<ListItem<ApiService>>>([]);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalContent, setModalContent] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await authFetch('https://apigateway.local/cfg/v1/users/', {
-          method: 'GET',
-        });
-        if (!response.ok) {
-          console.error(response);
-          throw new Error('Failed to fetch users');
-        }
-        const data = await response.json();
-        setUsers(data.map(user => ({ id: user.id, label: user.name }))); // Adjust according to your data structure
-      } catch (error) {
-        console.error('Error fetching users:', error);
+  async function fetchUsers(signal: AbortSignal) {
+    try {
+      const response = await authFetch('https://apigateway.local/cfg/v1/users/', {
+        method: 'GET',
+        signal
+      });
+      if (!response.ok) {
+        console.error(response);
+        throw new Error('Failed to fetch users');
       }
-    };
+      const data = await response.json();
+      setUsers(data.map(user => ({ id: user.id.id.String, label: user.username, record: user }))); // Adjust according to your data structure
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
-    const fetchServices = async () => {
-      try {
-        const response = await authFetch('https://apigateway.local/cfg/v1/api_services/', {
-          method: 'GET',
-        });
-        if (!response.ok) {
-          console.error(response);
-          throw new Error('Failed to fetch services');
-        }
-        const data = await response.json();
-        setServices(data.map(service => ({ id: service.id, label: service.name }))); // Adjust according to your data structure
-      } catch (error) {
-        console.error('Error fetching services:', error);
+  async function fetchServices(signal: AbortSignal) {
+    try {
+      const response = await authFetch('https://apigateway.local/cfg/v1/api_services/', {
+        method: 'GET',
+        signal
+      });
+      if (!response.ok) {
+        console.error(response);
+        throw new Error('Failed to fetch services');
       }
-    };
+      const data = await response.json();
+      setServices(data.map(service => ({ id: service.id.id.String, label: `${service.api_name}/${service.version}`, record: service }))); // Adjust according to your data structure
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    }
+  };
 
-    fetchUsers();
-    fetchServices();
+  useEffect(function loadUserData(){
+    const abortController: AbortController = new AbortController();
+    fetchUsers(abortController.signal);
+    fetchServices(abortController.signal);
+    return function abortLoadUserData(){abortController.abort("Component unmounted")};
   }, [authFetch]);
   // Adapted placeholder content for Users and Services sections
-  
-  const handleAddUser = () => {
-    console.log("Add User");
-    // Add user logic here
+
+  function handleAddUser(){
+    function handleUserAdded(user: GatewayUser) {
+      const newUsers = [...users, {
+        id: user.id.id.String,
+        label: user.username,
+        record: user,
+      }];
+      setUsers(newUsers);
+      setModalOpen(false);
+    }
+    setModalContent(<NewUserForm onSuccess={handleUserAdded} />);
+    setModalOpen(true);
   };
 
-  const handleConfigureUser = (userId) => {
-    console.log("Configure User:", userId);
-    // Configure user logic here
+  // Handlers for opening the modal with the specific form
+  function handleConfigureUser(usersIndex){
+    function handleUserUpdated(updatedUser: GatewayUser) {
+      const newUsers = [...users];
+      newUsers[usersIndex] = {
+        id: updatedUser.id.id.String,
+        label: updatedUser.username,
+        record: updatedUser,
+      };
+      setUsers(newUsers);
+      setModalOpen(false);
+    }
+    setModalContent(<UserConfigForm userData={users[usersIndex].record} onSuccess={handleUserUpdated} />);
+    setModalOpen(true);
+  }
+
+
+  function handleAddService(){
+    function handleServiceAdded(service: ApiService) {
+      const newServices = [...services, {
+        id: service.id.id.String,
+        label: service.api_name + "/" + service.version,
+        record: service,
+      }];
+      setServices(newServices);
+      setModalOpen(false);
+    }
+    setModalContent(<NewServiceForm onSuccess={handleServiceAdded} />);
+    setModalOpen(true);
   };
 
-  const handleAddService = () => {
-    console.log("Add Service");
-    // Add service logic here
+
+
+  function handleConfigureService (index: number) {
+
+    function handleServiceUpdated(service: ApiService) {
+      const newServices = [...services];
+      newServices[index] = {
+        id: service.id.id.String,
+        label: service.api_name + "/" + service.version,
+        record: service,
+      };
+      setServices(newServices);
+      setModalOpen(false);
+    }
+    setModalContent(<ServiceConfigForm serviceData={services[index].record} onSuccess={handleServiceUpdated} />);
+    setModalOpen(true);
   };
 
-  const handleConfigureService = (serviceId) => {
-    console.log("Configure Service:", serviceId);
-    // Configure service logic here
-  };
+  function handleCloseModal(){
+    setModalOpen(false);
+  }
 
   return (
     <AuthenticatedPage>
@@ -96,6 +157,9 @@ const DashboardPage = () => {
             onConfigure={handleConfigureService}
           />
         </div>
+        <Modal isOpen={modalOpen} onClose={handleCloseModal}>
+          {modalContent}
+        </Modal>
       </div>
     </AuthenticatedPage>
   );

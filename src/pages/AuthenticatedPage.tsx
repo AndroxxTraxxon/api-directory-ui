@@ -3,7 +3,7 @@ import React from 'react';
 import { RequireAuth, useAuth } from '../context/Auth'; // Adjust the import path as necessary
 import "./AuthenticatedPage.css";
 
-const AuthenticatedPage = ({ children }) => {
+function AuthenticatedPage({ children }){
   const { logout, claims } = useAuth();
   const currentYear = new Date().getFullYear(); // Get the current year for the copyright notice
 
