@@ -24,6 +24,11 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
         active: values.active,
         version: values.version,
         gateway_scopes: values.gateway_scopes.split(',').map(scope => scope.trim()),
+        environment: serviceData.environment,
+        contact_info: {
+          team: values.team,
+          email: values.email
+        }
         // Add other fields here as necessary
       }),
     });
@@ -50,7 +55,9 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
           active: serviceData.active,
           version: serviceData.version,
           gateway_scopes: serviceData.gateway_scopes.join(', '),
-          // Initialize other fields here as necessary
+          environment: serviceData.environment,
+          team: serviceData.contact_info.team,
+          email: serviceData.contact_info.email
         }}
         render={({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
@@ -74,7 +81,18 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
               <label>Gateway Scopes (comma-separated)</label>
               <Field name="gateway_scopes" component="input" placeholder="Gateway Scopes" />
             </div>
-            {/* Add more fields as needed */}
+            <div>
+              <label>Environment</label>
+              <Field name="environment" component="input" placeholder="Gateway Scopes" />
+            </div>
+            <div>
+              <label>Team</label>
+              <Field name="team" component="input" placeholder="Gateway Scopes" />
+            </div>
+            <div>
+              <label>Email</label>
+              <Field name="email" component="input" placeholder="Gateway Scopes" />
+            </div>
             <button type="submit">Save Changes</button>
           </form>
         )}

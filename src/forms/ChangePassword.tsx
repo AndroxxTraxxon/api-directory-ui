@@ -1,29 +1,25 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { useToast } from '../context/Toast';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/Auth';
 
-interface ResetPasswordFormProps {
-  token: string;
-}
-
-interface ResetPasswordFormValues {
-  username: string,
+interface ChangePasswordFormValues {
+  oldPassword: string,
   newPassword: string,
   confirmPassword: string
 }
 
-function ResetPasswordForm({token}: ResetPasswordFormProps){
-  const navigate = useNavigate();
+function ChangePasswordForm(){
+  const { authFetch } = useAuth();
   const { publish } = useToast();
 
-  async function onSubmit(values: ResetPasswordFormValues) {
-    const response = await fetch(
-      "https://apigateway.local/auth/v1/reset-password/" + token, {
+  async function onSubmit(values: ChangePasswordFormValues, form) {
+    const response = await authFetch(
+      "https://apigateway.local/auth/v1/set-password", {
       method: "PATCH",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: values.username,
+        old_password: values.oldPassword,
         password: values.newPassword
       })
     });
@@ -37,11 +33,11 @@ function ResetPasswordForm({token}: ResetPasswordFormProps){
     } else {
       publish({
         title: "Success",
-        message: "Your password was successfully reset",
+        message: "Your password was successfully changed",
         variant: 'success'
       });
-      return navigate("/login");
     }
+    form.reset();
   };
 
   function validate(values){
@@ -59,10 +55,10 @@ function ResetPasswordForm({token}: ResetPasswordFormProps){
       onSubmit={onSubmit}
       validate={validate}
       render={({ handleSubmit, submitting, form}) => (
-        <form onSubmit={event => handleSubmit(event)?.then(form.reset)}>
+        <form onSubmit={(event)=> handleSubmit(event)?.then(form.reset)}>
           <div>
-            <label>Username</label>
-            <Field name="username" component="input" type="text" placeholder="Username" required />
+            <label>Old Password</label>
+            <Field name="oldPassword" component="input" type="password" placeholder="Old Password" required />
           </div>
           <div>
             <label>New Password</label>
@@ -86,4 +82,4 @@ function ResetPasswordForm({token}: ResetPasswordFormProps){
   );
 };
 
-export default ResetPasswordForm;
+export default ChangePasswordForm;

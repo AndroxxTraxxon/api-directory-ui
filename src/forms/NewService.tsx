@@ -21,6 +21,11 @@ function NewServiceForm({ onSuccess }: NewServiceFormProps){
         active: values.active || false, // Default to false if not specified
         version: values.version,
         gateway_scopes: values.gateway_scopes ? values.gateway_scopes.split(',').map(scope => scope.trim()) : [],
+        environment: values.environment,
+        contact_info: {
+          team: values.team,
+          email: values.email
+        }
         // Include other fields as necessary
       }),
     });
@@ -63,7 +68,18 @@ function NewServiceForm({ onSuccess }: NewServiceFormProps){
               <label>Gateway Scopes (comma-separated)</label>
               <Field name="gateway_scopes" component="input" placeholder="Gateway Scopes" />
             </div>
-            {/* Add more fields as needed for a new service */}
+            <div>
+              <label>Environment</label>
+              <Field name="environment" component="input" placeholder="Gateway Scopes" />
+            </div>
+            <div>
+              <label>Team</label>
+              <Field name="team" component="input" placeholder="Gateway Scopes" />
+            </div>
+            <div>
+              <label>Email</label>
+              <Field name="email" component="input" placeholder="Gateway Scopes" />
+            </div>
             <button type="submit">Create Service</button>
           </form>
         )}

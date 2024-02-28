@@ -38,8 +38,8 @@ function RequestPasswordResetForm() {
   return (
     <Form
       onSubmit={onSubmit}
-      render={({ handleSubmit, submitting }) => (
-        <form onSubmit={handleSubmit}>
+      render={({ handleSubmit, submitting, form }) => (
+        <form onSubmit={(event) => handleSubmit(event)?.then(form.reset)}>
           <div>
             <label>Username</label>
             <Field name="username" component="input" type="text" placeholder="Username" required />

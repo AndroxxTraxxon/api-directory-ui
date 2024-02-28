@@ -11,7 +11,9 @@ import { GatewayUser } from '../models/user';
 import { ApiService } from '../models/service';
 import NewServiceForm from '../forms/NewService';
 import NewUserForm from '../forms/NewUser';
+import { useToast } from '../context/Toast';
 
+const CMP_UNMOUNT_ERR = "DashboardPage::Component_Unmounted"
 
 function DashboardPage(){
 
@@ -20,6 +22,7 @@ function DashboardPage(){
   const [services, setServices] = useState<Array<ListItem<ApiService>>>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalContent, setModalContent] = useState<any>(null);
+  const { publish } = useToast();
 
   async function fetchUsers(signal: AbortSignal) {
     try {
@@ -34,7 +37,13 @@ function DashboardPage(){
       const data = await response.json();
       setUsers(data.map(user => ({ id: user.id.id.String, label: user.username, record: user }))); // Adjust according to your data structure
     } catch (error) {
-      console.error('Error fetching users:', error);
+      if (error !== CMP_UNMOUNT_ERR && error.name !== "AbortError") {
+        publish({
+          title: "Error",
+          message: error.toString(),     
+          variant: 'error' 
+        });
+      }
     }
   };
 
@@ -51,7 +60,13 @@ function DashboardPage(){
       const data = await response.json();
       setServices(data.map(service => ({ id: service.id.id.String, label: `${service.api_name}/${service.version}`, record: service }))); // Adjust according to your data structure
     } catch (error) {
-      console.error('Error fetching services:', error);
+      if (error !== CMP_UNMOUNT_ERR && error.name !== "AbortError") {
+        publish({
+          title: "Error",
+          message: error.toString(),     
+          variant: 'error' 
+        });
+      }
     }
   };
 
@@ -59,7 +74,7 @@ function DashboardPage(){
     const abortController: AbortController = new AbortController();
     fetchUsers(abortController.signal);
     fetchServices(abortController.signal);
-    return function abortLoadUserData(){abortController.abort("Component unmounted")};
+    return function abortLoadUserData(){abortController.abort(CMP_UNMOUNT_ERR)};
   }, [authFetch]);
   // Adapted placeholder content for Users and Services sections
 
@@ -69,7 +84,7 @@ function DashboardPage(){
         id: user.id.id.String,
         label: user.username,
         record: user,
-      }];
+      }]; 
       setUsers(newUsers);
       setModalOpen(false);
     }

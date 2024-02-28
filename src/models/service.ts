@@ -52,13 +52,14 @@ export interface ApiService {
     active: boolean;
     version: string;
     gateway_scopes: string[];
-    created_date: string;
-    last_modified_date: string;
+    contact_info: ContactInfo;
+    environment: string;
+    created_date?: string;
+    last_modified_date?: string;
     auth_details?: AuthDetails;
     rate_limiting?: RateLimiting;
     health_check_url?: string;
     documentation_url?: string;
-    contact_info: ContactInfo;
     sla?: SLADetails;
     security_requirements?: SecurityRequirements;
     data_formats?: string[];
@@ -68,7 +69,6 @@ export interface ApiService {
     load_balancing_strategy?: string;
     custom_headers?: string[];
     dependencies?: string[];
-    environment: string;
     deployment_info?: DeploymentInfo;
     error_handling?: ErrorHandling;
     metadata?: Metadata[];

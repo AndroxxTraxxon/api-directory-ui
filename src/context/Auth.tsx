@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useToast } from './Toast';
 
+const ADMIN_PORTAL_AUDIENCE_TYPE = "admin";
+
 type AuthClaims = {
   sub: string;
   sub_id: string;
@@ -12,6 +14,7 @@ type AuthClaims = {
 };
 
 type AuthContextType = {
+  loadedAuth: boolean,
   claims: AuthClaims | null,
   login: (_: string) => void,
   logout: () => void,
@@ -46,6 +49,7 @@ function authorizeFetch(token: string) {
 }
 
 const AuthContext = createContext<AuthContextType>({
+  loadedAuth: false,
   claims: null,
   login: (_) => { },
   logout: () => { },
@@ -58,6 +62,7 @@ const localStorageAuthKey = "AuthorizationToken";
 
 export function AuthProvider({ children }) {
   const [tokenMeta, setTokenMeta] = useState<TokenMeta | null>(null);
+  const [loadedAuth, setLoadedAuth] = useState<boolean>(false);
   const { publish: postMessage } = useToast();
   const navigate = useNavigate();
   function logout() {
@@ -88,10 +93,12 @@ export function AuthProvider({ children }) {
         logout();
       }
     }
+    setLoadedAuth(true);
   }, []);
 
   return (
     <AuthContext.Provider value={{
+      loadedAuth,
       claims: tokenMeta?.claims || null,
       authFetch: tokenMeta && authorizeFetch(tokenMeta?.token) || fetch,
       login,
@@ -103,18 +110,23 @@ export function AuthProvider({ children }) {
 };
 
 export function RequireAuth({ children, redirectTo = "/login" }) {
-  const { claims, logout } = useAuth();
+  const { loadedAuth, claims, logout } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
-    if (claims === null) {
+    if (loadedAuth && claims === null) {
       return navigate(redirectTo);
     }
 
-  }, []);
+  }, [loadedAuth]);
 
-  if (!claims?.aud.includes("admin")) {
+  if(!loadedAuth){
+    return null;
+  }
+
+  if (!claims?.aud.includes(ADMIN_PORTAL_AUDIENCE_TYPE)) {
     return (<div>
       Only admins are permitted to leverage the configuration portal.
+      <br/>
       <button type='button' onClick={logout}>Log Out</button>
       </div>);
   }
