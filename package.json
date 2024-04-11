@@ -6,6 +6,7 @@
   "scripts": {
     "start": "rm -r .parcel-cache && parcel 'src/*.html' --lazy",
     "build": "parcel build --target default",
+    "build-dist": "parcel build --target dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -28,6 +29,10 @@
   "targets": {
     "default": {
       "distDir": "./build/default"
+    },
+    "dist": {
+      "distDir": "../www",
+      "publicUrl": "/app/"
     }
   },
   "source": "src/index.html"
