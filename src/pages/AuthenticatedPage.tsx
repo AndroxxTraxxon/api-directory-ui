@@ -14,7 +14,7 @@ function AuthenticatedPage({ children }) {
         <header>
           <nav>
             <NavLink
-              to="/" 
+              to="/app" 
               className={({ isActive, isPending }) =>
               isPending ? "pending" : isActive ? "active" : ""
             }>Home</NavLink>
