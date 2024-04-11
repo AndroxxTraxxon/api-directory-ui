@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useToast } from './Toast';
 
-const ADMIN_PORTAL_AUDIENCE_TYPE = "admin";
+export const GATEWAY_ADMIN_ROLE = "Gateway::Admin";
 
 type AuthClaims = {
   sub: string;
@@ -123,7 +123,7 @@ export function RequireAuth({ children, redirectTo = "/login" }) {
     return null;
   }
 
-  if (!claims?.aud.includes(ADMIN_PORTAL_AUDIENCE_TYPE)) {
+  if (!claims?.aud.includes(GATEWAY_ADMIN_ROLE)) {
     return (<div>
       Only admins are permitted to leverage the configuration portal.
       <br/>

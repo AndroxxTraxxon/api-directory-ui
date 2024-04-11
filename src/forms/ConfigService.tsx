@@ -1,36 +1,26 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { useAuth } from '../context/Auth'; // Ensure this path is correct
-import { ApiService } from '../models/service'; // Ensure this path is correct
+import { StoredApiRole, StoredApiService } from '../models/common'; // Ensure this path is correct
 import { DateDisplay } from '../common/Date';
+import RoleSelector from '../fields/RoleSelector';
 
 type ServiceFormProps = {
-  serviceData: ApiService,
-  onSuccess: (service: ApiService) => void
+  roles: Array<StoredApiRole>,
+  serviceData: StoredApiService,
+  onSuccess: (service: StoredApiService) => void
 }
 
-function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
+function ConfigServiceForm({ roles, serviceData, onSuccess }: ServiceFormProps){
   const { authFetch } = useAuth();
 
   const onSubmit = async (values) => {
-    const response = await authFetch(`https://apigateway.local/cfg/v1/api_services/${serviceData.id}`, {
+    const response = await authFetch(`https://apigateway.local/cfg/v1/api-services/${serviceData.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        api_name: values.api_name,
-        forward_url: values.forward_url,
-        active: values.active,
-        version: values.version,
-        gateway_scopes: values.gateway_scopes.split(',').map(scope => scope.trim()),
-        environment: serviceData.environment,
-        contact_info: {
-          team: values.team,
-          email: values.email
-        }
-        // Add other fields here as necessary
-      }),
+      body: JSON.stringify({...values}),
     });
 
     if (!response.ok) {
@@ -54,16 +44,21 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
           forward_url: serviceData.forward_url,
           active: serviceData.active,
           version: serviceData.version,
-          gateway_scopes: serviceData.gateway_scopes.join(', '),
           environment: serviceData.environment,
-          team: serviceData.contact_info.team,
-          email: serviceData.contact_info.email
+          roles: serviceData.roles.map(
+            role => ({ label: `${role.namespace}::${role.name}`, value: role.id })
+          ),
+          role_namespaces: serviceData.role_namespaces.map(ns => ({ label: ns, value: ns}))
         }}
         render={({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <div>
               <label>API Name</label>
               <Field name="api_name" component="input" placeholder="API Name" />
+            </div>
+            <div>
+              <label>Version</label>
+              <Field name="version" component="input" placeholder="Version" />
             </div>
             <div>
               <label>Forward URL</label>
@@ -74,24 +69,16 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
               <Field name="active" component="input" type="checkbox" />
             </div>
             <div>
-              <label>Version</label>
-              <Field name="version" component="input" placeholder="Version" />
+              <label>Role Namespaces</label>
+              <Field name="role_namespaces" component="input" placeholder="Gateway Scopes" />
             </div>
             <div>
-              <label>Gateway Scopes (comma-separated)</label>
-              <Field name="gateway_scopes" component="input" placeholder="Gateway Scopes" />
+              <label>Roles</label>
+              <RoleSelector name="roles" roles={roles}/>
             </div>
             <div>
               <label>Environment</label>
-              <Field name="environment" component="input" placeholder="Gateway Scopes" />
-            </div>
-            <div>
-              <label>Team</label>
-              <Field name="team" component="input" placeholder="Gateway Scopes" />
-            </div>
-            <div>
-              <label>Email</label>
-              <Field name="email" component="input" placeholder="Gateway Scopes" />
+              <Field name="environment" component="input" placeholder="Environment" />
             </div>
             <button type="submit">Save Changes</button>
           </form>
@@ -100,7 +87,7 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
 
       {/* Display non-editable metadata */}
       <h2>Metadata</h2>
-      <div>System ID: {serviceData.id.id.String}</div>
+      <div>System ID: {serviceData.id}</div>
       <div>Created Date: <DateDisplay value={serviceData.created_date}/></div>
       <div>Last Modified Date: <DateDisplay value={serviceData.last_modified_date}/></div>
       {/* Display other metadata fields */}
@@ -108,4 +95,4 @@ function ServiceConfigForm({ serviceData, onSuccess }: ServiceFormProps){
   );
 };
 
-export default ServiceConfigForm;
+export default ConfigServiceForm;

@@ -1,16 +1,30 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { useAuth } from '../context/Auth'; // Ensure this path is correct
+import { ApiRole, ApiService, OptionEntry, StoredApiRole, StoredApiService } from '../models/common';
+import RoleSelector, { NamespaceSelector } from '../fields/RoleSelector';
 
 type NewServiceFormProps = {
-  onSuccess: (service: any) => void; // Adjust the type according to your needs
+  roles: Array<StoredApiRole>,
+  onSuccess: (service: StoredApiService) => void; // Adjust the type according to your needs
 };
-
-function NewServiceForm({ onSuccess }: NewServiceFormProps){
+interface NewServiceFormValues {
+  api_name: string,
+  forward_url: string,
+  active: string,
+  version: string,
+  roles: Array<OptionEntry>,
+  role_namespaces: Array<OptionEntry>,
+  environment: string,
+}
+function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
   const { authFetch } = useAuth();
+  const namespaces = [...new Set(roles.map(role => role.namespace)).values()];
+  const  = []
+  const roleMap = Object.fromEntries(roles.map(role => [role.id, role]));
 
-  const onSubmit = async (values) => {
-    const response = await authFetch('https://apigateway.local/cfg/v1/api_services/', {
+  const onSubmit = async (values: NewServiceFormValues) => {
+    const response = await authFetch('https://apigateway.local/cfg/v1/api-services/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,12 +34,9 @@ function NewServiceForm({ onSuccess }: NewServiceFormProps){
         forward_url: values.forward_url,
         active: values.active || false, // Default to false if not specified
         version: values.version,
-        gateway_scopes: values.gateway_scopes ? values.gateway_scopes.split(',').map(scope => scope.trim()) : [],
+        roles: values.roles.map(option => roleMap[option.value]),
+        role_namespaces: values.role_namespaces.map(option => option.value),
         environment: values.environment,
-        contact_info: {
-          team: values.team,
-          email: values.email
-        }
         // Include other fields as necessary
       }),
     });
@@ -53,6 +64,10 @@ function NewServiceForm({ onSuccess }: NewServiceFormProps){
               <Field name="api_name" component="input" placeholder="API Name" />
             </div>
             <div>
+              <label>Version</label>
+              <Field name="version" component="input" placeholder="Version" />
+            </div>
+            <div>
               <label>Forward URL</label>
               <Field name="forward_url" component="input" placeholder="Forward URL" />
             </div>
@@ -61,25 +76,20 @@ function NewServiceForm({ onSuccess }: NewServiceFormProps){
               <Field name="active" component="input" type="checkbox" />
             </div>
             <div>
-              <label>Version</label>
-              <Field name="version" component="input" placeholder="Version" />
-            </div>
-            <div>
-              <label>Gateway Scopes (comma-separated)</label>
-              <Field name="gateway_scopes" component="input" placeholder="Gateway Scopes" />
-            </div>
-            <div>
               <label>Environment</label>
-              <Field name="environment" component="input" placeholder="Gateway Scopes" />
+              <Field name="environment" component="input" placeholder="Environment" />
+            </div>
+            <hr></hr>
+            <div>
+              <label>Role Namespaces</label>
+              <NamespaceSelector name="role_namespaces" namespaces={namespaces} />
             </div>
             <div>
-              <label>Team</label>
-              <Field name="team" component="input" placeholder="Gateway Scopes" />
+              <label>Roles</label>
+              <RoleSelector name="roles" roles={roles} />
             </div>
-            <div>
-              <label>Email</label>
-              <Field name="email" component="input" placeholder="Gateway Scopes" />
-            </div>
+
+
             <button type="submit">Create Service</button>
           </form>
         )}

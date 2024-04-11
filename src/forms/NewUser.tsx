@@ -1,13 +1,15 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { useAuth } from '../context/Auth'; // Ensure this path is correct
-import { GatewayUser } from '../models/user';
+import { StoredApiRole, GatewayUser } from '../models/common';
+import RoleSelector from '../fields/RoleSelector';
 
 type NewUserFormProps = {
+  roles: Array<StoredApiRole>,
   onSuccess: (user: GatewayUser) => void; // Adjust the type according to your needs
 };
 
-function NewUserForm({ onSuccess }: NewUserFormProps){
+function NewUserForm({ roles, onSuccess }: NewUserFormProps){
   const { authFetch } = useAuth();
 
   const onSubmit = async (values) => {
@@ -18,7 +20,7 @@ function NewUserForm({ onSuccess }: NewUserFormProps){
       },
       body: JSON.stringify({
         username: values.username,
-        scopes: values.scopes ? values.scopes.split(',').map(scope => scope.trim()) : [],
+        roles: values.roles ? values.roles.split(',').map(scope => scope.trim()) : [],
       }),
     });
 
@@ -45,8 +47,8 @@ function NewUserForm({ onSuccess }: NewUserFormProps){
               <Field name="username" component="input" placeholder="Username" />
             </div>
             <div>
-              <label>Scopes (comma-separated)</label>
-              <Field name="scopes" component="input" placeholder="Scopes" />
+              <label>Roles</label>
+              <RoleSelector name="roles" roles={roles}/>
             </div>
             <button type="submit">Create User</button>
           </form>

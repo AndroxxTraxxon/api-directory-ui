@@ -14,7 +14,7 @@
     /* Allows the list to grow to fill available space */
     margin: 10px;
     /* Adds some space between the lists */
-    max-width: calc(50% - 20px);
+    max-width: calc(33% - 20px);
     /* Sets a max-width to prevent lists from growing too large */
     /* Other styles remain unchanged */
 }
