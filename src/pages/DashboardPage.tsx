@@ -115,7 +115,7 @@ function DashboardPage() {
       setModalOpen(false);
       publish({
         title: "Success",
-        message: "Registered User " + user.username,
+        message: "Registered User: " + user.username,
         variant: 'success'
       });
     }
@@ -137,7 +137,7 @@ function DashboardPage() {
       setModalOpen(false);
       publish({
         title: "Success",
-        message: "Updated User " + updatedUser.username,
+        message: "Updated User: " + updatedUser.username,
         variant: 'success'
       });
     }
@@ -159,7 +159,7 @@ function DashboardPage() {
       setModalOpen(false);
       publish({
         title: "Success",
-        message: "Created Service " + serviceLabel,
+        message: "Created Service: " + serviceLabel,
         variant: 'success'
       });
     }
@@ -169,6 +169,7 @@ function DashboardPage() {
 
   function handleConfigureService(index: number) {
     function handleServiceUpdated(service: StoredApiService) {
+      const serviceLabel = service.api_name + "/" + service.version;
       const newServices = [...services];
       newServices[index] = {
         id: service.id,
@@ -177,6 +178,11 @@ function DashboardPage() {
       };
       setServices(newServices);
       setModalOpen(false);
+      publish({
+        title: "Success",
+        message: "Updated Service: " + serviceLabel,
+        variant: 'success'
+      });
     }
     setModalContent(<ConfigServiceForm serviceData={services[index].record} roles={roles.map(item => item.record)} onSuccess={handleServiceUpdated} />);
     setModalOpen(true);
@@ -219,7 +225,7 @@ function DashboardPage() {
       setModalOpen(false);
       publish({
         title: "Success",
-        message: "Created Role " + roleLabel,
+        message: "Updated Role " + roleLabel,
         variant: 'success'
       });
 

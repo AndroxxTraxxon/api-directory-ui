@@ -22,6 +22,7 @@ function App() {
               <Route path="/reset-password/:token?" element={<ResetPasswordPage />} />
               <Route path="/user-profile" element={<UserProfilePage />} />
               <Route path="/" element={<DashboardPage />} />
+              <Route path="/app" element={<DashboardPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
