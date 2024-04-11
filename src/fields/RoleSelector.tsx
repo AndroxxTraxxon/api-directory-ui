@@ -9,8 +9,8 @@ interface RoleSelectorProps {
     roles: Array<StoredApiRole>
 }
 
-function ReactSelectAdapter({ input, ...rest }) {
-    return <Select {...input} {...rest} searchable />
+export function ReactSelectAdapter({ input, ...rest }) {
+    return <Select {...input} {...rest} />
 }
 
 export default function RoleSelector({
@@ -26,6 +26,7 @@ export default function RoleSelector({
             value: role.id
         }))}
         isMulti
+        searchable
 
     />;
 }
@@ -45,5 +46,6 @@ export function NamespaceSelector({
         component={ReactSelectAdapter}
         options={namespaces.map(ns=>({label: ns, value: ns}))}
         isMulti
+        searchable
     />;
 }

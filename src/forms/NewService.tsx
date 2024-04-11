@@ -20,7 +20,7 @@ interface NewServiceFormValues {
 function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
   const { authFetch } = useAuth();
   const namespaces = [...new Set(roles.map(role => role.namespace)).values()];
-  const  = []
+  const assignableRoles = roles.filter(role => role.name !== "__ROLE_NAMESPACE_MEMBER__");
   const roleMap = Object.fromEntries(roles.map(role => [role.id, role]));
 
   const onSubmit = async (values: NewServiceFormValues) => {
@@ -86,10 +86,8 @@ function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
             </div>
             <div>
               <label>Roles</label>
-              <RoleSelector name="roles" roles={roles} />
+              <RoleSelector name="roles" roles={assignableRoles} />
             </div>
-
-
             <button type="submit">Create Service</button>
           </form>
         )}

@@ -3,7 +3,7 @@ import { Form, Field } from 'react-final-form';
 import { useAuth } from '../context/Auth'; // Ensure this path is correct
 import { StoredApiRole, StoredApiService } from '../models/common'; // Ensure this path is correct
 import { DateDisplay } from '../common/Date';
-import RoleSelector from '../fields/RoleSelector';
+import RoleSelector, { NamespaceSelector, ReactSelectAdapter,  } from '../fields/RoleSelector';
 
 type ServiceFormProps = {
   roles: Array<StoredApiRole>,
@@ -13,6 +13,9 @@ type ServiceFormProps = {
 
 function ConfigServiceForm({ roles, serviceData, onSuccess }: ServiceFormProps){
   const { authFetch } = useAuth();
+  const namespaces = [...new Set(roles.map(role => role.namespace)).values()];
+  const assignableRoles = roles.filter(role => role.name !== "__ROLE_NAMESPACE_MEMBER__");
+  const roleMap = Object.fromEntries(roles.map(role => [role.id, role]));
 
   const onSubmit = async (values) => {
     const response = await authFetch(`https://apigateway.local/cfg/v1/api-services/${serviceData.id}`, {
@@ -20,7 +23,16 @@ function ConfigServiceForm({ roles, serviceData, onSuccess }: ServiceFormProps){
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({...values}),
+      body: JSON.stringify({
+        api_name: values.api_name,
+        forward_url: values.forward_url,
+        active: values.active || false, // Default to false if not specified
+        version: values.version,
+        roles: values.roles.map(option => roleMap[option.value]),
+        role_namespaces: values.role_namespaces.map(option => option.value),
+        environment: values.environment.value,
+        // Include other fields as necessary
+      }),
     });
 
     if (!response.ok) {
@@ -44,7 +56,7 @@ function ConfigServiceForm({ roles, serviceData, onSuccess }: ServiceFormProps){
           forward_url: serviceData.forward_url,
           active: serviceData.active,
           version: serviceData.version,
-          environment: serviceData.environment,
+          environment: [{label: serviceData.environment, value: serviceData.environment}],
           roles: serviceData.roles.map(
             role => ({ label: `${role.namespace}::${role.name}`, value: role.id })
           ),
@@ -69,16 +81,22 @@ function ConfigServiceForm({ roles, serviceData, onSuccess }: ServiceFormProps){
               <Field name="active" component="input" type="checkbox" />
             </div>
             <div>
-              <label>Role Namespaces</label>
-              <Field name="role_namespaces" component="input" placeholder="Gateway Scopes" />
+              <label>Environment</label>
+              <Field
+                name="environment"
+                label="Environment"
+                component={ReactSelectAdapter}
+                options={["PRODUCTION", "STAGING", "CERTIFICATION", "DEVELOPMENT"].map(env => ({label: env, value: env}))}
+                searchable
+              />
+            </div>
+            <div>
+            <label>Role Namespaces</label>
+              <NamespaceSelector name="role_namespaces" namespaces={namespaces} />
             </div>
             <div>
               <label>Roles</label>
-              <RoleSelector name="roles" roles={roles}/>
-            </div>
-            <div>
-              <label>Environment</label>
-              <Field name="environment" component="input" placeholder="Environment" />
+              <RoleSelector name="roles" roles={assignableRoles}/>
             </div>
             <button type="submit">Save Changes</button>
           </form>

@@ -11,6 +11,7 @@ type NewUserFormProps = {
 
 function NewUserForm({ roles, onSuccess }: NewUserFormProps){
   const { authFetch } = useAuth();
+  const roleMap = Object.fromEntries(roles.map(role => [role.id, role]));
 
   const onSubmit = async (values) => {
     const response = await authFetch('https://apigateway.local/cfg/v1/users/', {
@@ -20,7 +21,7 @@ function NewUserForm({ roles, onSuccess }: NewUserFormProps){
       },
       body: JSON.stringify({
         username: values.username,
-        roles: values.roles ? values.roles.split(',').map(scope => scope.trim()) : [],
+        roles: values.roles?.map(role=>roleMap[role.value]) || []
       }),
     });
 
