@@ -21,7 +21,14 @@ function NewUserForm({ roles, onSuccess }: NewUserFormProps){
       },
       body: JSON.stringify({
         username: values.username,
-        roles: values.roles?.map(role=>roleMap[role.value]) || []
+        roles: values.roles?.map((role: {name: string, value: string})=>{
+          let storedRole = roleMap[role.value];
+          return {
+            id: storedRole.id,
+            namespace: storedRole.namespace,
+            name: storedRole.name
+          };
+        }) || []
       }),
     });
 

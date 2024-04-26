@@ -61,8 +61,6 @@ function ConfigRoleForm({ role, onSuccess }: UserFormProps){
 
       <h2>Metadata</h2>
       <div>System ID: {role.id}</div>
-      <div>Created Date: <DateDisplay value={role.created_date}/></div>
-      <div>Last Modified Date: <DateDisplay value={role.last_modified_date}/></div>
     </div>
   );
 };

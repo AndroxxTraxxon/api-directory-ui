@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Form, Field } from 'react-final-form';
 import { useAuth } from '../context/Auth'; // Ensure this path is correct
-import { ApiRole, ApiService, OptionEntry, StoredApiRole, StoredApiService } from '../models/common';
-import RoleSelector, { NamespaceSelector } from '../fields/RoleSelector';
+import { ApiService, OptionEntry, StoredApiRole, StoredApiService } from '../models/common';
+import RoleSelector, { NamespaceSelector, ReactSelectAdapter } from '../fields/RoleSelector';
 
 type NewServiceFormProps = {
   roles: Array<StoredApiRole>,
@@ -15,7 +15,7 @@ interface NewServiceFormValues {
   version: string,
   roles: Array<OptionEntry>,
   role_namespaces: Array<OptionEntry>,
-  environment: string,
+  environment: OptionEntry,
 }
 function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
   const { authFetch } = useAuth();
@@ -24,6 +24,7 @@ function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
   const roleMap = Object.fromEntries(roles.map(role => [role.id, role]));
 
   const onSubmit = async (values: NewServiceFormValues) => {
+    console.log("submitting new service", values)
     const response = await authFetch('https://apigateway.local/cfg/v1/api-services/', {
       method: 'POST',
       headers: {
@@ -34,9 +35,9 @@ function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
         forward_url: values.forward_url,
         active: values.active || false, // Default to false if not specified
         version: values.version,
-        roles: values.roles.map(option => roleMap[option.value]),
-        role_namespaces: values.role_namespaces.map(option => option.value),
-        environment: values.environment,
+        roles: values.roles && values.roles.map(option => roleMap[option.value]) || [],
+        role_namespaces: values.role_namespaces && values.role_namespaces.map(option => option.value) || [],
+        environment: values.environment.value,
         // Include other fields as necessary
       }),
     });
@@ -52,24 +53,35 @@ function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
     console.log('New service created successfully');
   };
 
+  const initialValues = useMemo<ApiService>(() => ({
+    api_name: "",
+    version: "",
+    forward_url: "",
+    active: true,
+    environment: "",
+    role_namespaces: [],
+    roles: []
+  }), []);
+
   return (
     <div>
       <h1>New Service Configuration</h1>
       <Form
         onSubmit={onSubmit}
+        initialValues={initialValues}
         render={({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <div>
               <label>API Name</label>
-              <Field name="api_name" component="input" placeholder="API Name" />
+              <Field name="api_name" component="input" placeholder="API Name" required/>
             </div>
             <div>
               <label>Version</label>
-              <Field name="version" component="input" placeholder="Version" />
+              <Field name="version" component="input" placeholder="Version" required />
             </div>
             <div>
               <label>Forward URL</label>
-              <Field name="forward_url" component="input" placeholder="Forward URL" />
+              <Field name="forward_url" component="input" placeholder="Forward URL" required/>
             </div>
             <div>
               <label>Active</label>
@@ -77,7 +89,14 @@ function NewServiceForm({ roles, onSuccess }: NewServiceFormProps) {
             </div>
             <div>
               <label>Environment</label>
-              <Field name="environment" component="input" placeholder="Environment" />
+              <Field
+                name="environment"
+                label="Environment"
+                component={ReactSelectAdapter}
+                options={["PRODUCTION", "STAGING", "CERTIFICATION", "DEVELOPMENT"].map(env => ({label: env, value: env}))}
+                searchable
+                required
+              />
             </div>
             <hr></hr>
             <div>

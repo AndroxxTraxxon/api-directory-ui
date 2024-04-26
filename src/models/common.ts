@@ -6,8 +6,6 @@ export interface ApiRole {
 
 export interface StoredApiRole extends ApiRole{
     id: string,
-    created_date: string,
-    last_modified_date: string
 }
 
 export interface ApiService {
