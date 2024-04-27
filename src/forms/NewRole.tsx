@@ -25,14 +25,14 @@ function NewRoleForm({ onSuccess }: NewRoleFormProps){
       return;
     }
 
-    const newUser = await response.json();
-    onSuccess(newUser); // Pass the new user data to the onSuccess handler
-    console.log('New user created successfully');
+    const newRole = await response.json();
+    onSuccess(newRole); // Pass the new role data to the onSuccess handler
+    console.log('New role created successfully');
   };
 
   return (
     <div>
-      <h1>New User Configuration</h1>
+      <h1>New Role Configuration</h1>
       <Form
         onSubmit={onSubmit}
         render={({ handleSubmit }) => (

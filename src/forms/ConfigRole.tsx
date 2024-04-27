@@ -40,7 +40,7 @@ function ConfigRoleForm({ role, onSuccess }: UserFormProps){
 
   return (
     <div>
-      <h1>User Configuration</h1>
+      <h1>Role Configuration</h1>
       <Form
         onSubmit={ handleSubmit }
         initialValues={{ namespace: role.namespace, name: role.name }}
